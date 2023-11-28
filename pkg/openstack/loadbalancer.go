@@ -20,7 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"k8s.io/klog/v2"
+	klog "k8s.io/klog/v2"
 	"reflect"
 	"regexp"
 	"strconv"
