@@ -21,14 +21,14 @@ import (
 	"fmt"
 	sysos "os"
 
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/client"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/metrics"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/util/errors"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 	v1 "k8s.io/api/core/v1"
 	cloudprovider "k8s.io/cloud-provider"
-	"k8s.io/cloud-provider-openstack/pkg/client"
-	"k8s.io/cloud-provider-openstack/pkg/metrics"
-	"k8s.io/cloud-provider-openstack/pkg/util/errors"
-	"k8s.io/klog/v2"
+	klog "k8s.io/klog/v2"
 )
 
 // InstancesV2 encapsulates an implementation of InstancesV2 for OpenStack.

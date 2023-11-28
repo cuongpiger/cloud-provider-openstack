@@ -26,6 +26,11 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/client"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/metrics"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/util"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/util/errors"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/util/metadata"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/flavors"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
@@ -34,16 +39,10 @@ import (
 	"github.com/gophercloud/gophercloud/pagination"
 	"github.com/mitchellh/mapstructure"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/klog/v2"
-
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation"
 	cloudprovider "k8s.io/cloud-provider"
-	"k8s.io/cloud-provider-openstack/pkg/client"
-	"k8s.io/cloud-provider-openstack/pkg/metrics"
-	"k8s.io/cloud-provider-openstack/pkg/util"
-	"k8s.io/cloud-provider-openstack/pkg/util/errors"
-	"k8s.io/cloud-provider-openstack/pkg/util/metadata"
+	klog "k8s.io/klog/v2"
 )
 
 // Instances encapsulates an implementation of Instances for OpenStack.

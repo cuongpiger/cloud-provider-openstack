@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"k8s.io/klog/v2"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -45,15 +46,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	cloudprovider "k8s.io/cloud-provider"
-	"k8s.io/klog/v2"
 	netutils "k8s.io/utils/net"
 	"k8s.io/utils/strings/slices"
 
-	"k8s.io/cloud-provider-openstack/pkg/metrics"
-	cpoutil "k8s.io/cloud-provider-openstack/pkg/util"
-	cpoerrors "k8s.io/cloud-provider-openstack/pkg/util/errors"
-	netsets "k8s.io/cloud-provider-openstack/pkg/util/net/sets"
-	openstackutil "k8s.io/cloud-provider-openstack/pkg/util/openstack"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/metrics"
+	cpoutil "github.com/cuongpiger/cloud-provider-openstack/pkg/util"
+	cpoerrors "github.com/cuongpiger/cloud-provider-openstack/pkg/util/errors"
+	netsets "github.com/cuongpiger/cloud-provider-openstack/pkg/util/net/sets"
+	openstackutil "github.com/cuongpiger/cloud-provider-openstack/pkg/util/openstack"
 )
 
 // Note: when creating a new Loadbalancer (VM), it can take some time before it is ready for use,

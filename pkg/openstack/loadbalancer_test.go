@@ -7,6 +7,7 @@ import (
 	"sort"
 	"testing"
 
+	cpoerrors "github.com/cuongpiger/cloud-provider-openstack/pkg/util/errors"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/loadbalancer/v2/listeners"
 	v2monitors "github.com/gophercloud/gophercloud/openstack/loadbalancer/v2/monitors"
@@ -15,7 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	cpoerrors "k8s.io/cloud-provider-openstack/pkg/util/errors"
 )
 
 type testPopListener struct {

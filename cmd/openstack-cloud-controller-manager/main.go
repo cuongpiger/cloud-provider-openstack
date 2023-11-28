@@ -22,6 +22,7 @@ package main
 import (
 	goflag "flag"
 	"fmt"
+	"k8s.io/klog/v2"
 	"os"
 
 	"github.com/spf13/pflag"
@@ -35,11 +36,10 @@ import (
 	"k8s.io/component-base/logs"
 	_ "k8s.io/component-base/metrics/prometheus/restclient" // for client metric registration
 	_ "k8s.io/component-base/metrics/prometheus/version"    // for version metric registration
-	"k8s.io/klog/v2"
-	_ "k8s.io/kubernetes/pkg/features" // add the kubernetes feature gates
+	_ "k8s.io/kubernetes/pkg/features"                      // add the kubernetes feature gates
 
-	"k8s.io/cloud-provider-openstack/pkg/openstack"
-	"k8s.io/cloud-provider-openstack/pkg/version"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/openstack"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/version"
 )
 
 func main() {

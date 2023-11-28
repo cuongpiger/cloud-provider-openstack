@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/metrics"
+	cpoerrors "github.com/cuongpiger/cloud-provider-openstack/pkg/util/errors"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/keymanager/v1/secrets"
-	"k8s.io/cloud-provider-openstack/pkg/metrics"
-	cpoerrors "k8s.io/cloud-provider-openstack/pkg/util/errors"
 )
 
 // EnsureSecret creates a secret if it doesn't exist.

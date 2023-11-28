@@ -31,9 +31,9 @@ import (
 	"github.com/gophercloud/utils/client"
 	"github.com/gophercloud/utils/openstack/clientconfig"
 
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/version"
 	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/client-go/util/cert"
-	"k8s.io/cloud-provider-openstack/pkg/version"
 	"k8s.io/klog/v2"
 )
 

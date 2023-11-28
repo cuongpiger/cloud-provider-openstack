@@ -18,6 +18,8 @@ package mount
 
 import (
 	"fmt"
+	"k8s.io/klog/v2"
+	"k8s.io/utils/mount"
 	"os"
 	"path"
 	"strings"
@@ -25,11 +27,9 @@ import (
 
 	"golang.org/x/sys/unix"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/klog/v2"
-	"k8s.io/mount-utils"
 	"k8s.io/utils/exec"
 
-	"k8s.io/cloud-provider-openstack/pkg/util/blockdevice"
+	"github.com/cuongpiger/cloud-provider-openstack/pkg/util/blockdevice"
 )
 
 const (
