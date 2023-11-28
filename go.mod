@@ -6,7 +6,7 @@ require (
 	github.com/container-storage-interface/spec v1.8.0
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/gophercloud/gophercloud v1.6.0
-	github.com/gophercloud/utils v0.0.0-20230330070308-5bd5e1d608f8
+	github.com/gophercloud/utils v0.0.0-20231010081019-80377eca5d56
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kubernetes-csi/csi-lib-utils v0.13.0
 	github.com/kubernetes-csi/csi-test/v5 v5.0.0
@@ -36,7 +36,7 @@ require (
 	k8s.io/component-base v0.29.0-alpha.2
 	k8s.io/klog/v2 v2.100.1
 	k8s.io/kms v0.29.0-alpha.2
-	k8s.io/kubernetes v1.29.0-alpha.2
+	k8s.io/kubernetes v1.15.0-alpha.0
 	k8s.io/mount-utils v0.29.0-alpha.2
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 	software.sslmate.com/src/go-pkcs12 v0.2.0

@@ -4,7 +4,7 @@
 
 #REPO_VERSION?=$(shell git describe --tags)
 
-GIT_HOST = k8s.io
+GIT_HOST = github.com/cuongpiger
 
 CONTAINER_ENGINE ?= docker
 
@@ -24,7 +24,7 @@ SOURCES := Makefile go.mod go.sum $(shell find $(DEST) -name '*.go' 2>/dev/null)
 HAS_GOX := $(shell command -v gox;)
 GOX_PARALLEL ?= 3
 
-TARGETS		?= linux/amd64 linux/386 linux/arm linux/arm64 linux/ppc64le linux/s390x
+TARGETS		?= linux/amd64
 DIST_DIRS	= find * -type d -exec
 
 TEMP_DIR	:=$(shell mktemp -d)
@@ -32,31 +32,18 @@ TAR_FILE	?= rootfs.tar
 
 GOOS		?= $(shell go env GOOS)
 GOPROXY		?= $(shell go env GOPROXY)
-VERSION         ?= $(shell git describe --dirty --tags --match='v*')
+VERSION     ?= "latest"
 GOARCH		:=
 GOFLAGS		:=
 TAGS		:=
-LDFLAGS		:= "-w -s -X 'k8s.io/component-base/version.gitVersion=$(VERSION)' -X 'k8s.io/cloud-provider-openstack/pkg/version.Version=$(VERSION)'"
+LDFLAGS		:= "-w -s -X 'k8s.io/component-base/version.gitVersion=$(VERSION)' -X 'github.com/cuongpiger/cloud-provider-openstack/pkg/version.Version=$(VERSION)'"
 GOX_LDFLAGS	:= $(shell echo "$(LDFLAGS) -extldflags \"-static\"")
-REGISTRY	?= registry.k8s.io/provider-os
+REGISTRY	?= quay.io/cuongdm8499
 IMAGE_OS	?= linux
-IMAGE_NAMES	?= openstack-cloud-controller-manager \
-				cinder-csi-plugin \
-				k8s-keystone-auth \
-				octavia-ingress-controller \
-				manila-csi-plugin \
-				barbican-kms-plugin \
-				magnum-auto-healer
+IMAGE_NAMES	?= openstack-cloud-controller-manager
 ARCH		?= amd64
-ARCHS		?= amd64 arm arm64 ppc64le s390x
-BUILD_CMDS	?= openstack-cloud-controller-manager \
-				cinder-csi-plugin \
-				k8s-keystone-auth \
-				octavia-ingress-controller \
-				manila-csi-plugin \
-				barbican-kms-plugin \
-				magnum-auto-healer \
-				client-keystone-auth
+ARCHS		?= amd64
+BUILD_CMDS	?= openstack-cloud-controller-manager
 
 # CTI targets
 
@@ -85,37 +72,6 @@ check: work
 
 unit: work
 	go test -tags=unit $(shell go list ./... | sed -e '/sanity/ { N; d; }' | sed -e '/tests/ {N; d;}') $(TESTARGS)
-
-functional:
-	@echo "$@ not yet implemented"
-
-test-cinder-csi-sanity: work
-	go test $(GIT_HOST)/$(BASE_DIR)/tests/sanity/cinder
-
-test-manila-csi-sanity: work
-	go test $(GIT_HOST)/$(BASE_DIR)/tests/sanity/manila
-
-# kept for compatibility reasons.
-fmt: check
-lint: check
-vet: check
-
-cover: work
-	go test -tags=unit $(shell go list ./...) -cover
-
-docs:
-	@echo "$@ not yet implemented"
-
-godoc:
-	@echo "$@ not yet implemented"
-
-releasenotes:
-	@echo "Reno not yet implemented for this repo"
-
-translation:
-	@echo "$@ not yet implemented"
-
-# Do the work here
 
 # Set up the development environment
 env:
