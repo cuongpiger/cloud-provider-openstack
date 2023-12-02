@@ -340,6 +340,8 @@ func (c *Controller) repairNodes(unhealthyNodes []healthcheck.NodeInfo) {
 							log.Errorf("Failed to get node %s, error: %v before update", nodeName, err)
 							return err
 						}
+
+						// Cordon the master node
 						newNode.Spec.Unschedulable = true
 						if _, updateErr := c.kubeClient.CoreV1().Nodes().Update(context.TODO(), newNode, metav1.UpdateOptions{}); updateErr != nil {
 							log.Warningf("Failed in retry to cordon node %s, error: %v", nodeName, updateErr)
@@ -351,7 +353,6 @@ func (c *Controller) repairNodes(unhealthyNodes []healthcheck.NodeInfo) {
 					})
 					if retryErr != nil {
 						log.Errorf("Failed to cordon node %s, error: %v", nodeName, retryErr)
-
 					}
 				}
 

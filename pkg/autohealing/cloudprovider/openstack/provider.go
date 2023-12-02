@@ -276,10 +276,25 @@ func (provider CloudProvider) firstTimeRepair(n healthcheck.NodeInfo, serverID s
 	}
 
 	var processed = false
+	rebootType := servers.SoftReboot
 	if firstTimeUnhealthy {
 		log.Infof("rebooting node %s to repair it", serverID)
 
-		if res := servers.Reboot(provider.Nova, serverID, servers.RebootOpts{Type: servers.SoftReboot}); res.Err != nil {
+		instance := servers.Get(provider.Nova, serverID)
+		if instance.Err != nil {
+			return false, instance.Err
+		}
+
+		serverStatus, err := instance.Extract()
+		if err != nil {
+			return false, err
+		}
+		if serverStatus.Status == "SHUTOFF" {
+			log.Infof("Node %s is already in SHUTOFF status, it will be hard reboot", serverID)
+			rebootType = servers.HardReboot
+		}
+
+		if res := servers.Reboot(provider.Nova, serverID, servers.RebootOpts{Type: rebootType}); res.Err != nil {
 			// Usually it means the node is being rebooted
 			log.Warningf("failed to reboot node %s, error: %v", serverID, res.Err)
 			if strings.Contains(res.Err.Error(), "reboot_started") {
