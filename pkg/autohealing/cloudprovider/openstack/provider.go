@@ -294,6 +294,11 @@ func (provider CloudProvider) firstTimeRepair(n healthcheck.NodeInfo, serverID s
 			rebootType = servers.HardReboot
 		}
 
+		if !n.IsWorker {
+			log.Infof("Node %s is master node, it will be hard reboot", serverID)
+			rebootType = servers.HardReboot
+		}
+
 		if res := servers.Reboot(provider.Nova, serverID, servers.RebootOpts{Type: rebootType}); res.Err != nil {
 			// Usually it means the node is being rebooted
 			log.Warningf("failed to reboot node %s, error: %v", serverID, res.Err)
