@@ -279,7 +279,7 @@ func (provider CloudProvider) firstTimeRepair(n healthcheck.NodeInfo, serverID s
 	if firstTimeUnhealthy {
 		log.Infof("rebooting node %s to repair it", serverID)
 
-		if res := servers.Reboot(provider.Nova, serverID, servers.RebootOpts{Type: servers.SoftReboot}); res.Err != nil {
+		if res := servers.Reboot(provider.Nova, serverID, servers.RebootOpts{Type: servers.HardReboot}); res.Err != nil {
 			// Usually it means the node is being rebooted
 			log.Warningf("failed to reboot node %s, error: %v", serverID, res.Err)
 			if strings.Contains(res.Err.Error(), "reboot_started") {
@@ -430,77 +430,6 @@ func (provider CloudProvider) Repair(nodes []healthcheck.NodeInfo) error {
 			delete(unHealthyNodes, serverID)
 			log.Infof("Cluster %s resized", clusterName)
 		}
-	} else {
-		clusterStackName, err := provider.getStackName(cluster.StackID)
-		if err != nil {
-			return fmt.Errorf("failed to get the Heat stack for cluster %s, error: %v", clusterName, err)
-		}
-
-		// In order to rebuild the nodes by Heat stack update, we need to know the parent stack ID of the resources and
-		// mark them unhealthy first.
-		allMapping, err := provider.getAllStackResourceMapping(clusterStackName, cluster.StackID)
-		if err != nil {
-			return fmt.Errorf("failed to get the resource stack mapping for cluster %s, error: %v", clusterName, err)
-		}
-
-		opts := stackresources.MarkUnhealthyOpts{
-			MarkUnhealthy:        true,
-			ResourceStatusReason: "Mark resource unhealthy by autohealing service",
-		}
-
-		for _, n := range nodes {
-			machineID := uuid.Parse(n.KubeNode.Status.NodeInfo.MachineID)
-			if machineID == nil {
-				log.Warningf("Failed to get the correct server ID for server %s", n.KubeNode.Name)
-				continue
-			}
-			serverID := machineID.String()
-
-			if processed, err := provider.firstTimeRepair(n, serverID, firstTimeRebootNodes); err != nil {
-				log.Warningf("Failed to process if the node %s is in first time repair , error: %v", serverID, err)
-			} else if processed {
-				log.Infof("Node %s has been processed", serverID)
-				continue
-			}
-
-			if rootVolumeID, err := provider.waitForServerDetachVolumes(serverID, 30*time.Second); err != nil {
-				log.Warningf("Failed to detach volumes from server %s, error: %v", serverID, err)
-			} else {
-				// Mark root volume as unhealthy
-				if rootVolumeID != "" {
-					err = stackresources.MarkUnhealthy(provider.Heat, allMapping[serverID].StackName, allMapping[serverID].StackID, rootVolumeID, opts).ExtractErr()
-					if err != nil {
-						log.Errorf("failed to mark resource %s unhealthy, error: %v", rootVolumeID, err)
-					}
-				}
-			}
-
-			if err := provider.waitForServerPoweredOff(serverID, 180*time.Second); err != nil {
-				log.Warningf("Failed to shutdown the server %s, error: %v", serverID, err)
-				// If the server is failed to delete after 180s, then delete it to avoid the
-				// stack update failure later.
-				res := servers.ForceDelete(provider.Nova, serverID)
-				if res.Err != nil {
-					log.Warningf("Failed to delete the server %s, error: %v", serverID, err)
-				}
-			}
-
-			log.Infof("Marking Nova VM %s(Heat resource %s) unhealthy for Heat stack %s", serverID, allMapping[serverID].ResourceID, cluster.StackID)
-
-			// Mark VM as unhealthy
-			err = stackresources.MarkUnhealthy(provider.Heat, allMapping[serverID].StackName, allMapping[serverID].StackID, allMapping[serverID].ResourceID, opts).ExtractErr()
-			if err != nil {
-				log.Errorf("failed to mark resource %s unhealthy, error: %v", serverID, err)
-			}
-
-			delete(unHealthyNodes, serverID)
-		}
-
-		if err := stacks.UpdatePatch(provider.Heat, clusterStackName, cluster.StackID, stacks.UpdateOpts{}).ExtractErr(); err != nil {
-			return fmt.Errorf("failed to update Heat stack to rebuild resources, error: %v", err)
-		}
-
-		log.Infof("Started Heat stack update to rebuild resources, cluster: %s, stack: %s", clusterName, cluster.StackID)
 	}
 
 	// Remove the broken nodes from the cluster

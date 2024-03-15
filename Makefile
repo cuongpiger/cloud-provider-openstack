@@ -31,8 +31,8 @@ TEMP_DIR	:=$(shell mktemp -d)
 TAR_FILE	?= rootfs.tar
 
 GOOS		?= $(shell go env GOOS)
-GOPROXY		?= $(shell go env GOPROXY)
-VERSION         ?= $(shell git describe --dirty --tags --match='v*')
+GOPROXY		?= ""
+VERSION     ?= "v1.0.0"
 GOARCH		:=
 GOFLAGS		:=
 TAGS		:=
@@ -40,23 +40,10 @@ LDFLAGS		:= "-w -s -X 'k8s.io/component-base/version.gitVersion=$(VERSION)' -X '
 GOX_LDFLAGS	:= $(shell echo "$(LDFLAGS) -extldflags \"-static\"")
 REGISTRY	?= registry.k8s.io/provider-os
 IMAGE_OS	?= linux
-IMAGE_NAMES	?= openstack-cloud-controller-manager \
-				cinder-csi-plugin \
-				k8s-keystone-auth \
-				octavia-ingress-controller \
-				manila-csi-plugin \
-				barbican-kms-plugin \
-				magnum-auto-healer
+IMAGE_NAMES	?= magnum-auto-healer
 ARCH		?= amd64
 ARCHS		?= amd64 arm arm64 ppc64le s390x
-BUILD_CMDS	?= openstack-cloud-controller-manager \
-				cinder-csi-plugin \
-				k8s-keystone-auth \
-				octavia-ingress-controller \
-				manila-csi-plugin \
-				barbican-kms-plugin \
-				magnum-auto-healer \
-				client-keystone-auth
+BUILD_CMDS	?= magnum-auto-healer
 
 # CTI targets
 
@@ -72,7 +59,7 @@ build-all-archs:
 build: $(BUILD_CMDS)
 
 $(BUILD_CMDS): $(SOURCES)
-	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) GOPROXY=${GOPROXY} go build \
+	 go build \
 		-trimpath \
 		-ldflags $(LDFLAGS) \
 		-o $@ \
@@ -159,14 +146,14 @@ shell:
 # Build a single image for the local default platform and push to the local
 # container engine
 build-local-image-%:
-	$(CONTAINER_ENGINE) buildx build --output type=docker \
+	$(CONTAINER_ENGINE) build \
 		--build-arg VERSION=$(VERSION) \
 		--tag $(REGISTRY)/$*:$(VERSION) \
 		--target $* \
 		.
 
 # Build all images locally
-build-local-images: $(addprefix build-image-,$(IMAGE_NAMES))
+build-local-images: $(addprefix build-local-image-,$(IMAGE_NAMES))
 
 # Build a single image for all architectures in ARCHS and push it to REGISTRY
 push-multiarch-image-%:

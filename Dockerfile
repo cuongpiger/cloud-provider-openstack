@@ -48,7 +48,7 @@ RUN apk add --no-cache ca-certificates
 # builder itself is always amd64
 FROM --platform=linux/amd64 ${GOLANG_IMAGE} as builder
 
-ARG GOPROXY=https://goproxy.io,direct
+ARG GOPROXY=""
 ARG TARGETOS
 ARG TARGETARCH
 ARG VERSION
@@ -57,7 +57,7 @@ WORKDIR /build
 COPY Makefile go.mod go.sum ./
 COPY cmd/ cmd/
 COPY pkg/ pkg/
-RUN make build GOOS=${TARGETOS} GOARCH=${TARGETARCH} GOPROXY=${GOPROXY} VERSION=${VERSION}
+COPY magnum-auto-healer /build/magnum-auto-healer
 
 
 ################################################################################
